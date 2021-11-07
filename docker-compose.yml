@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: 'docker.io/bitnami/mariadb:latest'
+    container_name: mariadb
+    ports:
+      - '3306:3306'
+    volumes:
+      - 'mariadb_data:/bitnami/mariadb'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_DATABASE=grafana
+      - MARIADB_ROOT_USER=root
+      - MARIADB_ROOT_PASSWORD=5QCSguAnu2mMBZMZ
+    networks:
+      - monitoring
+    healthcheck:
+      test: ['CMD', '/opt/bitnami/scripts/mariadb/healthcheck.sh']
+      interval: 15s
+      timeout: 5s
+      retries: 6
+
+  grafana:
+    image: grafana/grafana:8.2.0
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+#      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DATABASE_TYPE=mysql
+      - GF_DATABASE_HOST=mariadb
+      - GF_DATABASE_NAME=grafana
+      - GF_DATABASE_USER=root
+      - GF_DATABASE_PASSWORD=5QCSguAnu2mMBZMZ
+      - GF_ALERTING_ENABLED=true
+      - GF_UNIFIED_ALERTING_ENABLED=false
+    links:
+      - influxdb
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    labels:
+      org.label-schema.group: "monitoring"
+    depends_on:
+      - mariadb
+
+  influxdb:
+    image: influxdb:1.8.10
+    container_name: influxdb
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+      - "8090:8090"
+    networks:
+      - monitoring
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DATA_ENGINE=tsm1
+      - INFLUXDB_REPORTING_DISABLED=true
+      - INFLUXDB_GRAPHITE_BATCH_SIZE=1000
+
+  chronograf:
+    image: chronograf:1.9.1
+    container_name: chronograf
+    ports:
+      - "8888:8888"
+    networks:
+      - monitoring
+    volumes:
+      - chronograf_data:/var/lib/chronograf
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  mariadb_data:
+  grafana_data:
+  influxdb_data:
+  chronograf_data:
