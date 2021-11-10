@@ -39,6 +39,7 @@ services:
       - GF_DATABASE_PASSWORD=5QCSguAnu2mMBZMZ
       - GF_ALERTING_ENABLED=true
       - GF_UNIFIED_ALERTING_ENABLED=false
+      - GF_INSTALL_PLUGINS=pr0ps-trackmap-panel
     links:
       - influxdb
     restart: unless-stopped
@@ -78,6 +79,14 @@ services:
       - chronograf_data:/var/lib/chronograf
     environment:
       - INFLUXDB_URL=http://influxdb:8086
+
+  influx_file_uploader:
+    image: theharpia/influx_file_uploader:v1.0.3
+    container_name: influx_file_uploader
+    ports:
+      - "8080:80"
+    networks:
+      - monitoring
 
 
 networks:
