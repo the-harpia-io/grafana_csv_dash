@@ -84,7 +84,7 @@ services:
     image: theharpia/influx_file_uploader:v1.0.3
     container_name: influx_file_uploader
     ports:
-      - "8080:80"
+      - "8080:8080"
     networks:
       - monitoring
 
