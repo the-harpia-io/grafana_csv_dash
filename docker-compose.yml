@@ -22,7 +22,7 @@ services:
       retries: 6
 
   grafana:
-    image: grafana/grafana:8.2.0
+    image: grafana/grafana:8.2.5
     container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana
@@ -81,7 +81,7 @@ services:
       - INFLUXDB_URL=http://influxdb:8086
 
   influx_file_uploader:
-    image: theharpia/influx_file_uploader:v1.0.3
+    image: theharpia/influx_file_uploader:v1.0.4
     container_name: influx_file_uploader
     ports:
       - "8080:8080"
