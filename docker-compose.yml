@@ -81,7 +81,7 @@ services:
       - INFLUXDB_URL=http://influxdb:8086
 
   influx_file_uploader:
-    image: theharpia/influx_file_uploader:v1.0.6
+    image: theharpia/influx_file_uploader:v1.0.7
     container_name: influx_file_uploader
     ports:
       - "8080:8080"
